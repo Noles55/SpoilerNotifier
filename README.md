@@ -1,2 +1,2 @@
 # SpoilerNotifier
-Git test2
+Git test
