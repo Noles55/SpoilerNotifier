@@ -7,11 +7,12 @@ import time
 mainSite = 'http://mythicspoiler.com/'
 botId = '040978049f24a88d42767ca74c'
 threshold = 10
-sleepTime = 15
+sleepTime = 5
 
 def main():
     while True:
 
+        time.sleep(60 * sleepTime)
         # Get the newest spoilers page
         page = requests.get(mainSite + 'newspoilers.html')
 
@@ -38,14 +39,13 @@ def main():
         # Write to the last card file with the newest, most recent card, since we don't want to post it again
         lastCardFile.close()
         if len(cardsToSpoil) == 0:
-           print("No new cards to spoil")
-           return
+           continue
         elif len(cardsToSpoil) > threshold:
             postHeaders = {'Content-Type': 'application/json', }
             postData = '{"bot_id" : "' + botId + '", "text" : "More than ' + str(threshold) + ' new spoilers!"'
             response = requests.post('https://api.groupme.com/v3/bots/post', headers=postHeaders, data=postData)
             writeLastCard(cardsToSpoil[0])
-            return
+            continue
 
         writeLastCard(cardsToSpoil[0])
 
@@ -58,7 +58,7 @@ def main():
             response = requests.get(mainSite + card)
             if response.status_code != 200:
                 print("Failed to get card image data")
-                return
+                continue
 
             # Post the image data to the GroupMe Image
             imageHeaders = {'X-Access-Token' : os.environ['ACCESS_TOKEN'], 'Content-Type' : 'image/jpeg'}
@@ -67,7 +67,7 @@ def main():
 
             if response.status_code != 200:
                 print("Failed to post image data to GroupMe image service")
-                return
+                continue
 
             # Extract the image url from the response
             responseText = response.text
@@ -80,7 +80,7 @@ def main():
             postData = '{"bot_id" : "' + botId + '", "attachments" : [ { "type" : "image", "url" : "' + imageURL + '"} ] }'
             response = requests.post('https://api.groupme.com/v3/bots/post', headers=postHeaders, data=postData)
 
-            time.sleep(60 * sleepTime)
+
 
 
 def writeLastCard(card):
