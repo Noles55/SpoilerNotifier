@@ -6,7 +6,7 @@ import time
 
 mainSite = 'http://mythicspoiler.com/'
 botId = '040978049f24a88d42767ca74c'
-threshold = 10
+threshold = 20
 sleepTime = 5
 
 def main():
@@ -54,6 +54,8 @@ def main():
 
             print("Posting " + mainSite + card)
 
+            cardLink = re.search('([^.0-9]+)[0-9]*.jpg', card)
+            cardLink = mainSite + cardLink.group(1) + ".html"
             # Get the card image data
             response = requests.get(mainSite + card)
             if response.status_code != 200:
@@ -77,7 +79,8 @@ def main():
 
             # Post the image to the GroupMe chat
             postHeaders = {'Content-Type' : 'application/json',}
-            postData = '{"bot_id" : "' + botId + '", "attachments" : [ { "type" : "image", "url" : "' + imageURL + '"} ] }'
+            postData = '{"bot_id" : "' + botId + '", "text" : "' + cardLink + \
+                       '", "attachments" : [ { "type" : "image", "url" : "' + imageURL + '"} ] }'
             response = requests.post('https://api.groupme.com/v3/bots/post', headers=postHeaders, data=postData)
 
 
