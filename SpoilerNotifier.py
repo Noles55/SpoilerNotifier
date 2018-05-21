@@ -83,6 +83,10 @@ def main():
                        '", "attachments" : [ { "type" : "image", "url" : "' + imageURL + '"} ] }'
             response = requests.post('https://api.groupme.com/v3/bots/post', headers=postHeaders, data=postData)
 
+            if response.status_code != 200:
+                print("Failed to post the link and image to the chat")
+                continue
+
 
 
 
