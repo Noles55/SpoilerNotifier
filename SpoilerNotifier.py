@@ -1,8 +1,8 @@
-import os
 from lxml import html
 import requests
-import re
 import time
+import os
+import re
 
 mainSite = 'http://mythicspoiler.com/'
 botId = '040978049f24a88d42767ca74c'
@@ -76,23 +76,17 @@ def main():
             imageURL = re.search('.url\":\"([^"]+)', responseText)
             imageURL = imageURL.group(1)
 
-
             # Post the image to the GroupMe chat
             postHeaders = {'Content-Type' : 'application/json',}
             postData = '{"bot_id" : "' + botId + '", "text" : "' + cardLink + \
                        '", "attachments" : [ { "type" : "image", "url" : "' + imageURL + '"} ] }'
             response = requests.post('https://api.groupme.com/v3/bots/post', headers=postHeaders, data=postData)
 
-            if response.status_code != 200:
-                print("Failed to post the link and image to the chat")
-                continue
-
-
-
 
 def writeLastCard(card):
     lastCardFile = open("LastCard.txt", 'w')
     lastCardFile.write(card)
     lastCardFile.close()
+
 
 main()
