@@ -5,14 +5,21 @@ import os
 import re
 
 mainSite = 'http://mythicspoiler.com/'
-botId = '040978049f24a88d42767ca74c'
-threshold = 20
+botId = os.environ['BOT_ID']
+threshold = 40
 sleepTime = 5
 
 def main():
+
+    firstLoop = True
+
     while True:
 
-        time.sleep(60 * sleepTime)
+        if not firstLoop:
+            time.sleep(60 * sleepTime)
+
+        firstLoop = False
+
         # Get the newest spoilers page
         page = requests.get(mainSite + 'newspoilers.html')
 
@@ -29,9 +36,11 @@ def main():
         # List for new cards to post
         cardsToSpoil = list()
 
+
         # Add the card paths to the cardsToSpoil list, stopping once we reach the last card spoiled from the previous post
         for card in allCards:
-            if card == lastCard:
+
+            if lastCard in card:
                 break
 
             cardsToSpoil.append(card)
@@ -52,9 +61,11 @@ def main():
         # Retrieve each card image and post it to GroupMe via the bot
         for card in cardsToSpoil:
 
+            time.sleep(2)
+
             print("Posting " + mainSite + card)
 
-            cardLink = re.search('([^.0-9]+)[0-9]*.jpg', card)
+            cardLink = re.search('(.*/[^.[0-9]+)[0-9]*.jpg', card)
             cardLink = mainSite + cardLink.group(1) + ".html"
             # Get the card image data
             response = requests.get(mainSite + card)
@@ -83,9 +94,12 @@ def main():
             response = requests.post('https://api.groupme.com/v3/bots/post', headers=postHeaders, data=postData)
 
 
+
+
 def writeLastCard(card):
     lastCardFile = open("LastCard.txt", 'w')
-    lastCardFile.write(card)
+    cardRegex = re.search('/cards/(.*[^0-9])[0-9]*\..+', card)
+    lastCardFile.write(cardRegex.group(1))
     lastCardFile.close()
 
 
